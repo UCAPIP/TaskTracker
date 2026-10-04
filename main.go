@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// Структура задачи
+// Structure of the Task
 type Task struct {
 	Id          int    `json:"id"`
 	Description string `json:"description"`
@@ -32,40 +32,40 @@ func (t *Task) UpdateDescription(description string) {
 	t.Touch()
 }
 
-// Статусы задач
+// Task Statuses
 const (
 	StatusDone       = "done"
 	StatusTodo       = "todo"
 	StatusInProgress = "in-progress"
 )
 
-// Путь JSON
+// JSON Path
 var jsonPath = "Tasks.json"
 
-// Загрузка задач из файла
+// Loading Tasks from a File
 func loadTasks(path string) ([]Task, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println("Файл не существует")
+			fmt.Println("The file does not exist")
 			return []Task{}, nil
 		}
-		return nil, fmt.Errorf("ошибка чтения файла: %w", err)
+		return nil, fmt.Errorf("File read error: %w", err)
 	}
 
 	if len(data) == 0 {
-		fmt.Println("Задач нет. Чтобы создать новую задачу введите команду: task-cli add [текст задачи]")
+		fmt.Println("There are no tasks. To create a new task, enter the command: task-cli add [task text]")
 		return []Task{}, nil
 	}
 
 	var tasks []Task
 	if err := json.Unmarshal(data, &tasks); err != nil {
-		return nil, fmt.Errorf("ошибка парсинга JSON: %w", err)
+		return nil, fmt.Errorf("JSON parsing error: %w", err)
 	}
 	return tasks, nil
 }
 
-// Добавление новой задачи
+// Adding a New Task
 func add(data *[]Task, description string) {
 	maxID := func(tasks []Task) int {
 		maxId := 0
@@ -89,38 +89,38 @@ func add(data *[]Task, description string) {
 
 	newData, err := json.MarshalIndent(*data, "", "  ")
 	if err != nil {
-		fmt.Println("ошибка сериализации:", err)
+		fmt.Println("serialization error:", err)
 		return
 	}
 
 	err = os.WriteFile(jsonPath, newData, 0644)
 	if err != nil {
-		fmt.Println("ошибка записи в JSON:", err)
+		fmt.Println("JSON writing error:", err)
 		return
 	}
 
-	fmt.Println("Таска добавлена, файл обновлён")
+	fmt.Println("The task has been added, and the file has been updated")
 
 }
 
-// Обновление текста(description) задачи
+// Updating the task description
 func update(data *[]Task, id int, description string) {
 
 	for i, task := range *data {
 		if task.Id == id {
-			fmt.Println("Старый текст задачи:", (*data)[i].Description)
-			fmt.Println("Новый текст задачи: ", description)
+			fmt.Println("Old task text:", (*data)[i].Description)
+			fmt.Println("New task text: ", description)
 			(*data)[i].UpdateDescription(description)
 
 			newData, err := json.MarshalIndent(*data, "", "  ")
 			if err != nil {
-				fmt.Println("ошибка сериализации:", err)
+				fmt.Println("serialization error:", err)
 				return
 			}
 
 			err = os.WriteFile(jsonPath, newData, 0644)
 			if err != nil {
-				fmt.Println("ошибка записи в JSON:", err)
+				fmt.Println("JSON writing error:", err)
 				return
 			}
 
@@ -129,11 +129,11 @@ func update(data *[]Task, id int, description string) {
 		}
 	}
 
-	fmt.Println("Задача с id", id, "не найдена")
+	fmt.Println("The task with id", id, "was not found")
 
 }
 
-// Смена статуса задачи (done\in-progress)
+// Changing a task's status (done/in progress)
 func markStatus(data *[]Task, id int, status string) {
 	for i, task := range *data {
 		if task.Id == id {
@@ -141,13 +141,13 @@ func markStatus(data *[]Task, id int, status string) {
 
 			newData, err := json.MarshalIndent(*data, "", "  ")
 			if err != nil {
-				fmt.Println("ошибка сериализации:", err)
+				fmt.Println("serialization error:", err)
 				return
 			}
 
 			err = os.WriteFile(jsonPath, newData, 0644)
 			if err != nil {
-				fmt.Println("ошибка записи в JSON:", err)
+				fmt.Println("JSON writing error:", err)
 				return
 			}
 
@@ -156,11 +156,11 @@ func markStatus(data *[]Task, id int, status string) {
 		}
 	}
 
-	fmt.Println("Задача с id", id, "не найдена")
+	fmt.Println("The task with id", id, "was not found")
 
 }
 
-// Удаление задачи
+// Deleting a Task
 func deleteTask(data *[]Task, id int) {
 
 	for i, task := range *data {
@@ -169,28 +169,28 @@ func deleteTask(data *[]Task, id int) {
 
 			newData, err := json.MarshalIndent(*data, "", "  ")
 			if err != nil {
-				fmt.Println("ошибка сериализации:", err)
+				fmt.Println("serialization error:", err)
 				return
 			}
 
 			err = os.WriteFile(jsonPath, newData, 0644)
 			if err != nil {
-				fmt.Println("ошибка записи в JSON:", err)
+				fmt.Println("JSON writing error:", err)
 				return
 			}
 
-			fmt.Println("Задача", id, "удалена")
+			fmt.Println("The task", id, "was deleted")
 
 			return
 
 		}
 	}
 
-	fmt.Println("Задача с id", id, "не найдена")
+	fmt.Println("The task with id", id, "was not found")
 
 }
 
-// Вывод списка задач, доступена филтрация по статусу(all\done\todo\in-progress). По дефолту выводим all
+// Display a list of tasks; filtering by status (all, done, todo, in-progress) is available. By default, “all” is displayed.
 func listTasks(tasks []Task, filter string) {
 	for _, t := range tasks {
 		switch filter {
@@ -209,36 +209,36 @@ func listTasks(tasks []Task, filter string) {
 				printTask(t)
 			}
 		default:
-			fmt.Fprintf(os.Stderr, "Неизвестный фильтр: %s\n", filter)
+			fmt.Fprintf(os.Stderr, "Unknown filter: %s\n", filter)
 			os.Exit(1)
 		}
 	}
 }
 
-// Функция для форматирования вывода задач на печать
+// A function for formatting the output of print Tasks
 func printTask(t Task) {
-	fmt.Printf("ID: %d | %s | %s | создано: %s | обновлено: %s\n",
+	fmt.Printf("ID: %d | %s | %s | created: %s | updated: %s\n",
 		t.Id, t.Description, t.Status, t.CreatedAt, t.UpdatedAt)
 }
 
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Println("Использование: task-cli <command> [args]")
-		fmt.Println("Команды: add, update, delete, mark-done, mark-in-progress, list")
+		fmt.Println("Usage: task-cli <command> [args]")
+		fmt.Println("Commands: add, update, delete, mark-done, mark-in-progress, list")
 		os.Exit(1)
 	}
 
 	tasks, err := loadTasks(jsonPath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Ошибка загрузки задач: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error loading tasks: %v\n", err)
 		os.Exit(1)
 	}
 
 	switch os.Args[1] {
 	case "add":
 		if len(os.Args) < 3 {
-			fmt.Println("Использование: task-cli add <description>")
+			fmt.Println("Usage: task-cli add <description>")
 			os.Exit(1)
 		}
 		description := strings.Join(os.Args[2:], " ")
@@ -246,12 +246,12 @@ func main() {
 
 	case "update":
 		if len(os.Args) < 4 {
-			fmt.Println("Использование: task-cli update <id> <description>")
+			fmt.Println("Usage: task-cli update <id> <description>")
 			os.Exit(1)
 		}
 		id, err := strconv.Atoi(os.Args[2])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Некорректный ID: %s\n", os.Args[2])
+			fmt.Fprintf(os.Stderr, "Invalid ID: %s\n", os.Args[2])
 			os.Exit(1)
 		}
 		description := strings.Join(os.Args[3:], " ")
@@ -259,36 +259,36 @@ func main() {
 
 	case "delete":
 		if len(os.Args) < 3 {
-			fmt.Println("Использование: task-cli delete <id>")
+			fmt.Println("Usage: task-cli delete <id>")
 			os.Exit(1)
 		}
 		id, err := strconv.Atoi(os.Args[2])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Некорректный ID: %s\n", os.Args[2])
+			fmt.Fprintf(os.Stderr, "Invalid ID: %s\n", os.Args[2])
 			os.Exit(1)
 		}
 		deleteTask(&tasks, id)
 
 	case "mark-done":
 		if len(os.Args) < 3 {
-			fmt.Println("Использование: task-cli mark-done <id>")
+			fmt.Println("Usage: task-cli mark-done <id>")
 			os.Exit(1)
 		}
 		id, err := strconv.Atoi(os.Args[2])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Некорректный ID: %s\n", os.Args[2])
+			fmt.Fprintf(os.Stderr, "Invalid ID: %s\n", os.Args[2])
 			os.Exit(1)
 		}
 		markStatus(&tasks, id, StatusDone)
 
 	case "mark-in-progress":
 		if len(os.Args) < 3 {
-			fmt.Println("Использование: task-cli mark-in-progress <id>")
+			fmt.Println("Usage: task-cli mark-in-progress <id>")
 			os.Exit(1)
 		}
 		id, err := strconv.Atoi(os.Args[2])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Некорректный ID: %s\n", os.Args[2])
+			fmt.Fprintf(os.Stderr, "Invalid ID: %s\n", os.Args[2])
 			os.Exit(1)
 		}
 		markStatus(&tasks, id, StatusInProgress)
@@ -301,7 +301,7 @@ func main() {
 		listTasks(tasks, filter)
 
 	default:
-		fmt.Fprintf(os.Stderr, "Неизвестная команда: %s\n", os.Args[1])
+		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", os.Args[1])
 		os.Exit(1)
 	}
 
